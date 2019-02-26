@@ -1,0 +1,4 @@
+chatenv/
+.idea/
+gui.py
+web.py
