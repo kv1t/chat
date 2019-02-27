@@ -99,13 +99,13 @@ def chat_gui():
         if msg != '':
             #print(msg)
             msg_var.set('')
-            is_sended = send_msg(ip_var.get(), nick_var.get(), msg_var.get())
+            is_sended = send_msg(ip_var.get(), nick_var.get(), msg)
             if is_sended == True:
                 text_entry.config(state=NORMAL)
                 text_entry.insert(END, nick_var.get()+': '+msg+'\n')
                 text_entry.config(state=DISABLED)
                 set_config(ip_var.get(),nick_var.get())
-                fill_log(str(HOST), nick_var.get(), msg_var.get())
+                fill_log(HOST, nick_var.get(), msg)
             else:
                 showinfo("warning", "no connection to the specified server")
 
@@ -124,7 +124,7 @@ def chat_gui():
         rec_num = int(log_dict['INFO']['RECORDS_NUMBER'])
         les = int(log_dict['INFO']['LAST_ENTRY_SHOWN'])
         log_dict['CHAT_LOG'][str(rec_num+1)] = ip + sender + msg
-        log_dict['PARSE'][str(rec_num+1)] = "I" + len(ip) + "S" + len(sender) + "M" + len(msg)
+        log_dict['PARSE'][str(rec_num+1)] = "I" + str(len(ip)) + "S" + str(len(sender)) + "M" + str(len(msg))
         log_dict['INFO']['RECORDS_NUMBER'] = str(rec_num+1)
         if (rec_num - les) > 20: log_dict['INFO']['LAST_ENTRY_SHOWN'] = str(les+1)
 
