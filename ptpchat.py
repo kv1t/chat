@@ -197,7 +197,7 @@ def chat_gui():
 
     new_msg.trace("w", lambda *args: msg_get())
 
-    text_entry = ScrolledText(main_frame, wrap=WORD, width=50, height=20, state=DISABLED)
+    text_entry = ScrolledText(main_frame, wrap=WORD, width=50, height=30, state=DISABLED)
     text_entry.pack()
 
 
