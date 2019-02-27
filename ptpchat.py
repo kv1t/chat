@@ -55,6 +55,7 @@ def server():
 #main part(gui + etc.)
 def chat_gui():
     #gui init + variables + config inits
+    log_use = True
     start_init()
     chat_window = Tk()
     chat_window.title('P-2-P Chat')
@@ -114,7 +115,8 @@ def chat_gui():
         text_entry.config(state=NORMAL)
         text_entry.insert(END, inc_sender.get()+': '+new_msg.get()+'\n')
         text_entry.config(state=DISABLED)
-        fill_log(inc_addr.get(), inc_sender.get(), new_msg.get())
+        nonlocal log_use
+        if log_use: fill_log(inc_addr.get(), inc_sender.get(), new_msg.get())
 
     #fill log file
     def fill_log(ip, sender, msg):
@@ -140,6 +142,8 @@ def chat_gui():
     #fill chat from log file
     def fill_chat():
         nonlocal log_dict
+        nonlocal log_use
+        log_use = False
         log_dict = configparser.ConfigParser()
         log_dict.read('log.ini')
         rec_num = int(log_dict['INFO']['RECORDS_NUMBER'])
@@ -152,11 +156,13 @@ def chat_gui():
                 m_pos = parse.find("M")
                 m_len = int(parse[(m_pos+1):])
                 s_len = int(parse[(s_pos+1):(m_pos-len(parse))])
-                msg, logstr = logstr[(len(logstr)-m_len):]
+                msg = logstr[(len(logstr)-m_len):]
+                logstr = logstr[:(-1*m_len)]
                 sender = logstr[(len(logstr)-s_len):]
                 inc_sender.set(sender)
                 new_msg.set(msg)
-                msg_get()
+                #msg_get()
+        log_use = True
 
     #set basic params for chat session - target ip and nick
     def button_param_set():
