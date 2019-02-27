@@ -6,9 +6,9 @@ from tkinter.messagebox import showinfo
 from threading import Thread
 import configparser
 
-#HOST = '192.168.1.163'
-#PORT = 7555
 shutdown = False
+HOST = ''
+PORT = None
 
 #init settings from config
 def start_init():
@@ -21,8 +21,6 @@ def start_init():
 
 #sending msg to target ip
 def send_msg(host, sender, msg):
-    #host = '192.168.1.116'
-    #sender = 'win_user'
     with socket(AF_INET, SOCK_STREAM) as sock_cl:
         try:
             sock_cl.connect((host, PORT))
@@ -37,6 +35,7 @@ def server():
         sock.bind((HOST, PORT))
         sock.listen()
         while True:
+            #try:
             client, addr = sock.accept()
             global shutdown
             if shutdown == True: break
@@ -51,6 +50,8 @@ def server():
                     new_msg.set(msg[16:])
                     inc_addr.set(addr)
                     client.sendall(b'1')
+            #except:
+                #pass
 
 #main part(gui + etc.)
 def chat_gui():
@@ -76,7 +77,6 @@ def chat_gui():
     #set last valid target ip and nickname as default
     def second_init():
         nonlocal set_dict
-        #config = configparser.ConfigParser()
         set_dict.read('settings.ini')
         nonlocal ip_var
         ip = set_dict['DEFAULT']['LAST_IP']
@@ -91,8 +91,6 @@ def chat_gui():
         config = configparser.ConfigParser()
         set_dict['DEFAULT']['LAST_IP'] = ip
         set_dict['DEFAULT']['LAST_NICKNAME'] = nick
-        #with open('settings.ini', 'w') as configfile:
-        #    config.write(configfile)
 
     #send and write target msg
     def button_msg_send():
@@ -121,8 +119,6 @@ def chat_gui():
     #fill log file
     def fill_log(ip, sender, msg):
         nonlocal log_dict
-        #config = configparser.ConfigParser()
-        #config.read('log.ini')
         rec_num = int(log_dict['INFO']['RECORDS_NUMBER'])
         les = int(log_dict['INFO']['LAST_ENTRY_SHOWN'])
         log_dict['CHAT_LOG'][str(rec_num+1)] = ip + sender + msg
@@ -167,9 +163,7 @@ def chat_gui():
     #set basic params for chat session - target ip and nick
     def button_param_set():
         nick = nick_var.get()
-        #print(nick)
         ip = ip_var.get()
-        #print(ip)
         if ((3 <= len(nick) <= 16) and (nick.isalnum())):
             try:
                 inet_aton(ip)
@@ -177,16 +171,16 @@ def chat_gui():
                 warn_label.pack_forget()
             except error:
                 warn_label.config(text='Invalid IP')
-                #main_frame.pack()
         else:
             warn_label.config(text='Nick name not valid')
-            #main_frame.pack()
 
     #close programm
     def close_program():
         write_log()
         global shutdown
         shutdown = True
+        with socket(AF_INET,SOCK_STREAM) as cl_sock:
+            cl_sock.connect((HOST, PORT))
         chat_window.destroy()
 
     #gui tools init
