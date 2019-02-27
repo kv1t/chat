@@ -105,7 +105,7 @@ def chat_gui():
                 text_entry.insert(END, nick_var.get()+': '+msg+'\n')
                 text_entry.config(state=DISABLED)
                 set_config(ip_var.get(),nick_var.get())
-                fill_log(HOST, nick_var.get(), msg_var.get())
+                fill_log(str(HOST), nick_var.get(), msg_var.get())
             else:
                 showinfo("warning", "no connection to the specified server")
 
@@ -123,7 +123,8 @@ def chat_gui():
         #config.read('log.ini')
         rec_num = int(log_dict['INFO']['RECORDS_NUMBER'])
         les = int(log_dict['INFO']['LAST_ENTRY_SHOWN'])
-        log_dict['CHAT_LOG'][str(rec_num+1)] = (ip, sender, msg)
+        log_dict['CHAT_LOG'][str(rec_num+1)] = ip + sender + msg
+        log_dict['PARSE'][str(rec_num+1)] = "I" + len(ip) + "S" + len(sender) + "M" + len(msg)
         log_dict['INFO']['RECORDS_NUMBER'] = str(rec_num+1)
         if (rec_num - les) > 20: log_dict['INFO']['LAST_ENTRY_SHOWN'] = str(les+1)
 
@@ -145,7 +146,14 @@ def chat_gui():
         les = int(log_dict['INFO']['LAST_ENTRY_SHOWN'])
         if rec_num > 0:
             for i in range(les, rec_num):
-                _, sender, msg = log_dict['CHAT_LOG'][str(i+1)]
+                logstr = log_dict['CHAT_LOG'][str(i+1)]
+                parse = log_dict['PARSE'][str(i+1)]
+                s_pos = parse.find("S")
+                m_pos = parse.find("M")
+                m_len = int(parse[(m_pos+1):])
+                s_len = int(parse[(s_pos+1):(m_pos-len(parse))])
+                msg, logstr = logstr[(len(logstr)-m_len):]
+                sender = logstr[(len(logstr)-s_len):]
                 inc_sender.set(sender)
                 new_msg.set(msg)
                 msg_get()
